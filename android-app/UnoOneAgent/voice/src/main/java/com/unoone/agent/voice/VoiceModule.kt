@@ -5,8 +5,8 @@ import com.unoone.agent.core.model.Result
 import com.unoone.agent.core.util.Logger
 import com.unoone.agent.voice.recorder.AudioRecorder
 import com.unoone.agent.voice.stt.AndroidSttEngine
-import com.unoone.agent.voice.stt.SherpaSttEngine
-import com.unoone.agent.voice.tts.SherpaTtsEngine
+import com.unoone.agent.voice.stt.LocalSttEngine
+import com.unoone.agent.voice.tts.LocalTtsEngine
 import com.unoone.agent.voice.tts.TtsPlayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,8 +15,8 @@ import java.util.Locale
 class VoiceModule(private val context: Context) {
 
     private val recorder = AudioRecorder()
-    private var sttEngine: SherpaSttEngine? = null
-    private var ttsEngine: SherpaTtsEngine? = null
+    private var sttEngine: LocalSttEngine? = null
+    private var ttsEngine: LocalTtsEngine? = null
     private var androidStt: AndroidSttEngine? = null
     private val ttsPlayer = TtsPlayer()
     private var useAndroidStt = true
@@ -33,29 +33,29 @@ class VoiceModule(private val context: Context) {
         }
 
     fun initStt(modelDir: String): Result<Unit> {
-        val engine = SherpaSttEngine(modelDir)
+        val engine = LocalSttEngine(modelDir)
         val result = engine.initialize()
         return if (result is Result.Success) {
             sttEngine = engine
             useAndroidStt = false
-            Logger.i("Using Sherpa-ONNX for STT")
+            Logger.i("Using local engine for STT")
             result
         } else {
-            Logger.w("Sherpa STT init failed, falling back to Android SpeechRecognizer")
+            Logger.w("Local STT init failed, falling back to Android SpeechRecognizer")
             useAndroidStt = true
             Result.Success(Unit)
         }
     }
 
     fun initTts(modelDir: String): Result<Unit> {
-        val engine = SherpaTtsEngine(modelDir)
+        val engine = LocalTtsEngine(modelDir)
         val result = engine.initialize()
         return if (result is Result.Success) {
             ttsEngine = engine
-            Logger.i("Using Sherpa-ONNX for TTS")
+            Logger.i("Using local engine for TTS")
             result
         } else {
-            Logger.w("Sherpa TTS init failed, TTS will use Android fallback")
+            Logger.w("Local TTS init failed, TTS will use Android fallback")
             result
         }
     }
@@ -83,7 +83,7 @@ class VoiceModule(private val context: Context) {
     }
 
     /**
-     * Highly accurate, multilingual on-device transcription supporting English and Indian languages.
+     * Android system STT fallback.
      */
     suspend fun transcribeWithAndroid(locale: Locale = Locale("en", "IN")): Result<String> {
         return withContext(Dispatchers.Main) {
@@ -95,7 +95,7 @@ class VoiceModule(private val context: Context) {
     }
 
     /**
-     * Highly accurate, offline speech synthesis supporting Indian languages (Hindi, Tamil, Telugu) and English.
+     * Text-to-speech via local engine or Android fallback.
      */
     fun speak(text: String, languageCode: String = "en-IN"): Result<Unit> {
         val engine = ttsEngine

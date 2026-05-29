@@ -6,28 +6,28 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 /**
- * Offline STT using Sherpa-ONNX.
- * Uses reflection/safe-loading to ensure the app compiles and runs perfectly 
+ * Offline STT engine wrapper.
+ * Uses reflection/safe-loading to ensure the app compiles and runs perfectly
  * on any Android device even if the native .so libraries are missing.
  */
-class SherpaSttEngine(private val modelDir: String) {
+class LocalSttEngine(private val modelDir: String) {
 
     private var recognizer: Any? = null
     private var initialized = false
 
     fun initialize(): Result<Unit> {
         return try {
-            Logger.i("SherpaSttEngine: Checking model files in $modelDir")
+            Logger.i("LocalSttEngine: Checking model files in $modelDir")
             val encoderFile = java.io.File("$modelDir/encoder.onnx")
             val decoderFile = java.io.File("$modelDir/decoder.onnx")
             val joinerFile = java.io.File("$modelDir/joiner.onnx")
             val tokensFile = java.io.File("$modelDir/tokens.txt")
 
             if (!encoderFile.exists() || !decoderFile.exists() || !joinerFile.exists() || !tokensFile.exists()) {
-                return Result.Error("Sherpa STT model files missing. Please download models to: $modelDir")
+                return Result.Error("Offline STT model files missing. Please download models to: $modelDir")
             }
 
-            // Attempt to load Sherpa-ONNX classes dynamically
+            // Attempt to load native STT classes dynamically
             val configClass = Class.forName("com.k2fsa.sherpa.onnx.OfflineRecognizerConfig")
             val modelConfigClass = Class.forName("com.k2fsa.sherpa.onnx.OfflineModelConfig")
             val transducerConfigClass = Class.forName("com.k2fsa.sherpa.onnx.OfflineTransducerModelConfig")
@@ -48,20 +48,20 @@ class SherpaSttEngine(private val modelDir: String) {
 
             recognizer = recognizerClass.getConstructor(configClass).newInstance(config)
             initialized = true
-            Logger.i("SherpaSttEngine: Offline STT successfully initialized with hardware optimization")
+            Logger.i("LocalSttEngine: Offline STT successfully initialized with hardware optimization")
             Result.Success(Unit)
         } catch (e: ClassNotFoundException) {
-            Logger.w("SherpaSttEngine: Sherpa-ONNX classes not found in classpath. Falling back to System STT.")
-            Result.Error("Sherpa library not available")
+            Logger.w("LocalSttEngine: Native STT classes not found in classpath. Falling back to System STT.")
+            Result.Error("Native STT library not available")
         } catch (e: Exception) {
-            Logger.e("SherpaSttEngine: Initialization failed", e)
-            Result.Error("Sherpa STT failed: ${e.message}")
+            Logger.e("LocalSttEngine: Initialization failed", e)
+            Result.Error("Offline STT failed: ${e.message}")
         }
     }
 
     fun transcribe(pcmBytes: ByteArray): Result<String> {
         if (!initialized || recognizer == null) {
-            return Result.Error("SherpaSttEngine not initialized")
+            return Result.Error("LocalSttEngine not initialized")
         }
 
         return try {
@@ -82,10 +82,10 @@ class SherpaSttEngine(private val modelDir: String) {
             val resultObj = decodeMethod.invoke(recognizer, wave)
             val text = offlineRecognizerResultClass.getMethod("getText").invoke(resultObj) as String
 
-            Logger.i("SherpaSttEngine: Transcription complete: '$text'")
+            Logger.i("LocalSttEngine: Transcription complete: '$text'")
             Result.Success(text.trim())
         } catch (e: Exception) {
-            Logger.e("SherpaSttEngine: Transcription failed", e)
+            Logger.e("LocalSttEngine: Transcription failed", e)
             Result.Error("Transcription failed: ${e.message}")
         }
     }
@@ -99,7 +99,7 @@ class SherpaSttEngine(private val modelDir: String) {
                 recognizerClass.getMethod("close").invoke(recognizer)
             }
         } catch (e: Exception) {
-            Logger.e("SherpaSttEngine: Error closing recognizer", e)
+            Logger.e("LocalSttEngine: Error closing recognizer", e)
         }
         recognizer = null
         initialized = false

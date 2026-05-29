@@ -27,6 +27,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     
-    // ONNX Runtime for Gemma and other local models
+    // ONNX Runtime for local inference
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.18.0")
 }

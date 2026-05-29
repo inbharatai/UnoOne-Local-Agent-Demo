@@ -88,58 +88,11 @@ object PermissionManager {
     }
 
     /**
-     * Returns an intent for the device manufacturer's autostart/battery settings,
-     * or null if the device doesn't have a known manufacturer-specific settings screen.
-     * Works across Xiaomi (MIUI), Samsung, Huawei, Oppo, Vivo, and Asus.
+     * Returns an intent for the device manufacturer's autostart/battery settings.
+     * In a production app, this would navigate to manufacturer-specific settings.
+     * The public demo returns null; use standard battery optimization instead.
      */
     fun getAutostartIntent(context: Context): Intent? {
-        val manufacturer = Build.MANUFACTURER.lowercase()
-        return when {
-            manufacturer.contains("xiaomi") || manufacturer.contains("redmi") -> {
-                tryIntent(
-                    ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")
-                )
-            }
-            manufacturer.contains("samsung") -> {
-                // Samsung doesn't have a specific autostart screen; battery optimization covers it
-                null
-            }
-            manufacturer.contains("huawei") || manufacturer.contains("honor") -> {
-                tryIntent(
-                    ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")
-                )
-            }
-            manufacturer.contains("oppo") -> {
-                tryIntent(
-                    ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity")
-                ) ?: tryIntent(
-                    ComponentName("com.oppo.safe", "com.oppo.safe.permission.startup.StartupAppListActivity")
-                )
-            }
-            manufacturer.contains("vivo") -> {
-                tryIntent(
-                    ComponentName("com.vivo.abe", "com.vivo.applicationbehaviorengine.ui.ExcessivePowerManagerActivity")
-                )
-            }
-            manufacturer.contains("asus") -> {
-                tryIntent(
-                    ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.powersaver.PowerSaverActivity")
-                )
-            }
-            manufacturer.contains("oneplus") -> {
-                tryIntent(
-                    ComponentName("com.oneplus.security", "com.oneplus.security.network.oplaunch.AutoLaunchActivity")
-                )
-            }
-            else -> null
-        }
-    }
-
-    /**
-     * Try to create an intent for a specific component. Returns null if the
-     * component doesn't exist on this device (non-MIUI phones, etc.).
-     */
-    private fun tryIntent(component: ComponentName): Intent? {
-        return Intent().setComponent(component)
+        return null
     }
 }

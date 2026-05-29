@@ -13,7 +13,7 @@ import kotlinx.serialization.json.jsonPrimitive
 /**
  * Local Inference Layer (Demo Stub).
  *
- * Demonstrates the architecture for loading a Gemma-compatible ONNX model
+ * Demonstrates the architecture for loading a local ONNX-compatible model
  * and running on-device inference. The public repo includes the shell only;
  * production tokenizer integration and KV-cache management are intentionally excluded.
  */
@@ -65,7 +65,7 @@ class LocalBrain {
      * Runs inference using the loaded ONNX model.
      *
      * NOTE: This is a public demo stub. The production implementation includes:
-     * - A full tokenizer (SentencePiece / TikToken)
+     * - A full tokenizer compatible with your target model format
      * - KV-cache management for efficient generation
      * - Structured output parsing with retry logic
      * - Memory context injection

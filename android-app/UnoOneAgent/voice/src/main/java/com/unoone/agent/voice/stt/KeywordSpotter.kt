@@ -6,8 +6,8 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 /**
- * Offline Keyword Spotter using Sherpa-ONNX.
- * Uses reflection/safe-loading to ensure the app compiles and runs perfectly 
+ * Offline Keyword Spotter wrapper.
+ * Uses reflection/safe-loading to ensure the app compiles and runs perfectly
  * on any Android device even if the native .so libraries are missing.
  */
 class KeywordSpotterEngine(private val modelDir: String) {
@@ -24,13 +24,13 @@ class KeywordSpotterEngine(private val modelDir: String) {
             val tokensFile = java.io.File("$modelDir/tokens.txt")
 
             if (!encoderFile.exists() || !decoderFile.exists() || !joinerFile.exists() || !tokensFile.exists()) {
-                return Result.Error("Sherpa KWS model files missing. Please download models to: $modelDir")
+                return Result.Error("Offline KWS model files missing. Please download models to: $modelDir")
             }
 
             // Create temporary keyword file
             val keywordFile = createKeywordFile(keywords)
 
-            // Attempt to load Sherpa-ONNX classes dynamically
+            // Attempt to load native KWS classes dynamically
             val configClass = Class.forName("com.k2fsa.sherpa.onnx.KeywordSpotterConfig")
             val modelConfigClass = Class.forName("com.k2fsa.sherpa.onnx.OfflineModelConfig")
             val transducerConfigClass = Class.forName("com.k2fsa.sherpa.onnx.OfflineTransducerModelConfig")
@@ -55,8 +55,8 @@ class KeywordSpotterEngine(private val modelDir: String) {
             Logger.i("KeywordSpotterEngine: Offline KWS successfully initialized for: $keywords")
             Result.Success(Unit)
         } catch (e: ClassNotFoundException) {
-            Logger.w("KeywordSpotterEngine: Sherpa-ONNX classes not found in classpath. Fallback mode.")
-            Result.Error("Sherpa library not available")
+            Logger.w("KeywordSpotterEngine: Native KWS classes not found in classpath. Fallback mode.")
+            Result.Error("Native KWS library not available")
         } catch (e: Exception) {
             Logger.e("KeywordSpotterEngine: Initialization failed", e)
             Result.Error("KWS init failed: ${e.message}")

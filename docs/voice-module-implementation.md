@@ -1,8 +1,8 @@
-# Voice Module — STT/TTS Layer
+# Voice Layer — STT/TTS
 
 ## Overview
 
-The voice module handles all audio I/O: microphone recording, Voice Activity Detection (VAD), Speech-to-Text (STT), and Text-to-Speech (TTS).
+The voice module handles all audio I/O: microphone recording, voice activity detection, speech-to-text (STT), and text-to-speech (TTS).
 
 ```
 ┌─────────────────────────────────────────┐
@@ -13,47 +13,36 @@ The voice module handles all audio I/O: microphone recording, Voice Activity Det
     ┌──────────────┼──────────────┐
     ▼              ▼              ▼
 ┌────────┐   ┌──────────┐   ┌──────────┐
-│ Audio  │   │ Sherpa   │   │ Sherpa   │
+│ Audio  │   │ Local    │   │ Local    │
 │Record  │   │ STT      │   │ TTS      │
-│(PCM)   │   │(ONNX)    │   │(ONNX)    │
+│(PCM)   │   │ Engine   │   │ Engine   │
 └────────┘   └──────────┘   └──────────┘
 ```
 
 ## Technology
 
-| Component | Library | Note |
-|-----------|---------|------|
-| STT | Sherpa-ONNX | Offline, supports English + Indian languages |
-| TTS | Sherpa-ONNX / Piper | Offline, supports English + Indian languages |
-| Fallback STT | Android SpeechRecognizer | Requires internet |
-| Audio Record | AudioRecord (PCM 16-bit) | 16 kHz mono |
-
-## Dependencies
-
-```kotlin
-// In voice/build.gradle.kts
-implementation("com.github.k2-fsa:sherpa-onnx-android:1.10.0")
-```
+| Component | Approach |
+|-----------|----------|
+| STT | Offline local engine (via ONNX Runtime) |
+| TTS | Offline local engine (via ONNX Runtime) |
+| Fallback STT | Android SpeechRecognizer (requires internet) |
+| Audio Record | Standard Android AudioRecord (PCM) |
 
 ## Model Files
 
-| Model | Size | Push Command |
-|-------|------|-------------|
-| Sherpa-ONNX ASR | ~70 MB | `adb push models/sherpa-asr/ ...` |
-| Sherpa-ONNX TTS | ~30–60 MB | `adb push models/sherpa-tts/ ...` |
-| VAD / Wake word | ~10–30 MB | `adb push models/vad/ ...` |
+Voice models are loaded from local device storage. They are excluded from Git by `.gitignore` and pushed via ADB.
 
 ## Public Demo Status
 
 The public repo includes:
-- `AudioRecorder.kt` — full implementation
-- `SherpaSttEngine.kt` — wrapper with reflection-safe loading
-- `SherpaTtsEngine.kt` — wrapper with reflection-safe loading
-- `AndroidSttEngine.kt` — fallback implementation
-- `TtsPlayer.kt` — native audio track player
-- `KeywordSpotter.kt` — wake word detection shell
+- Audio recorder implementation
+- STT engine wrapper (reflection-safe loading)
+- TTS engine wrapper (reflection-safe loading)
+- Android STT fallback
+- Native audio track player
+- Wake word detection shell
 
-The real Sherpa-ONNX JNI calls are behind reflection to allow compilation without the AAR. Uncomment the direct calls when you add the dependency and models.
+The real JNI calls are behind reflection to allow compilation without proprietary AARs. Direct calls can be enabled when dependencies and models are added.
 
 ## Notes
 

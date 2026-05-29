@@ -1,8 +1,8 @@
-# Local Inference Layer — LocalBrain
+# Local Inference Layer
 
 ## Overview
 
-The `localbrain` module loads a Gemma-compatible local LLM and runs inference on-device to convert user commands into structured `ToolCall` JSON.
+The local inference module loads a small, compatible local language model and runs inference on-device to convert user commands into structured tool calls.
 
 ## Architecture
 
@@ -23,9 +23,9 @@ The `localbrain` module loads a Gemma-compatible local LLM and runs inference on
 
 ## Model Loading
 
-- Uses **ONNX Runtime** with optional **NNAPI** acceleration.
-- Falls back to CPU if NNAPI is unavailable.
-- Model path is passed at runtime from `ModelManager`.
+- Uses ONNX Runtime with optional hardware acceleration.
+- Falls back to CPU if acceleration is unavailable.
+- Model path is passed at runtime from the model manager.
 
 ## Prompt Builder (Stub)
 
@@ -43,26 +43,19 @@ interface PromptBuilder {
 The public demo includes:
 - `loadModel(path)` — initializes ONNX Runtime session
 - `unloadModel()` — releases resources
-- `runInference(prompt)` — **STUB**: returns a mock `ToolCall`
+- `runInference(prompt)` — **STUB**: returns a mock tool call
 - `parseToolCall(output)` — extracts JSON from model output
 
 ## Production Exclusions
 
 The following are intentionally not in the public repo:
-- Tokenizer integration (SentencePiece / TikToken)
+- Tokenizer integration
 - KV-cache management for efficient generation
 - Structured output parsing with retry logic
 - Memory context injection into prompts
 - Advanced prompt templates for each tool category
 
-## Model Format
-
-- **Recommended**: Gemma 2B IT quantized to ONNX or TFLite
-- **Alternative**: Any ONNX-compatible small LLM
-- **Path**: `models/gemma-local/` (pushed via ADB)
-
 ## Notes
 
-- Until a real model is loaded, `RuleBasedParser` handles all commands offline.
-- The rule-based parser supports 30+ command patterns.
+- Until a real model is loaded, a rule-based fallback handles commands offline.
 - Model files are excluded from Git by `.gitignore`.

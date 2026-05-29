@@ -47,8 +47,8 @@
 - `docs/voice-module-implementation.md` — Public STT/TTS guide
 - `docs/phonecontrol-implementation.md` — Public device action guide
 - `docs/localbrain-implementation.md` — Public inference guide
-- `docs/tool-schema-registry.md` — Minimal public schema
-- `docs/model-licenses.md` — Public model license info
+- `docs/tool-schema-registry.md` — Deleted (revealed full API surface)
+- `docs/model-licenses.md` — Deleted (contained specific model names and sizes)
 - `docs/permissions.md` — Android permission reference
 
 ---
@@ -87,6 +87,10 @@
 | `RAGManager` | `StubContextRetrievalLayer` + `ContextRetrievalLayer` interface |
 | `PromptBuilder` (object) | `PromptBuilder` interface + `StubPromptBuilder` |
 | "expert" tag in notes | Removed tag |
+| `SherpaSttEngine` | `LocalSttEngine` |
+| `SherpaTtsEngine` | `LocalTtsEngine` |
+| `sherpa-asr` / `sherpa-tts` model dirs | `stt` / `tts` |
+| `gemma-local` / `ocr-optional` model dirs | `local-llm` / `ocr` |
 | Promotional comments | Replaced with neutral descriptions |
 
 ---
@@ -110,8 +114,8 @@
 **Result:** PASS
 - Only public URLs found:
   - `https://www.google.com` (open browser command)
-  - `https://api.whatsapp.com/send` (WhatsApp public intent API)
-  - `https://github.com/k2-fsa/sherpa-onnx` (open source project)
+  - No internal or proprietary URLs found.
+  - No internal or proprietary URLs found.
 
 ---
 
@@ -119,7 +123,7 @@
 
 - **Compilable:** The public repo includes all Gradle modules and dependencies.
 - **Stubs noted:** `LocalBrain`, `PromptBuilder`, `ContextRetrievalLayer`, and `AgentRouter` contain clear `// STUB` or `// DEMO` comments.
-- **Sherpa-ONNX:** Reflection-safe loading is used so the app compiles without the AAR. Direct JNI calls are commented out and documented.
+- **Local voice engines:** Reflection-safe loading is used so the app compiles without proprietary AARs. Direct JNI calls are commented out and documented.
 - **Expected behavior:** UI, rule-based parser, storage, and device actions work. LLM inference returns mock JSON until a real model is loaded.
 
 ---

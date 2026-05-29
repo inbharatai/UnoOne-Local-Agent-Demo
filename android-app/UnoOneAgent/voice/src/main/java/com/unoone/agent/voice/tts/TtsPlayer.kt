@@ -73,7 +73,7 @@ class TtsPlayer : TextToSpeech.OnInitListener {
     }
 
     fun playPcm(samples: FloatArray, sampleRate: Int = 22050): Result<Unit> {
-        // Fallback for Sherpa RAW PCM arrays if native .so is used
+        // Fallback for native engine RAW PCM arrays
         Logger.w("playPcm: Stub fallback. In universal mode, use standard speak() method.")
         return Result.Success(Unit)
     }

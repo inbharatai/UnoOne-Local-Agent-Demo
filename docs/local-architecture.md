@@ -39,7 +39,7 @@ UnoOne is built as a collection of Gradle modules to keep boundaries clean and e
 |--------|-------------|
 | `app` | Compose UI, ViewModels, FloatingService, MainActivity, PermissionManager |
 | `core` | Shared data models: `Result`, `ToolCall`, `TimelineStep`, `RiskLevel`, `Logger` |
-| `voice` | STT/TTS layer: AudioRecorder, Sherpa-ONNX wrappers, Android fallback |
+| `voice` | STT/TTS layer: AudioRecorder, local engine wrappers, Android fallback |
 | `localbrain` | Local inference layer shell: ONNX model loading, stub inference, JSON parser |
 | `agentrouter` | Tool registry shell: validates tool names, routes to stub handlers |
 | `safetyguard` | Permission & approval layer: 4-tier risk classification |
@@ -65,8 +65,8 @@ storage ← all feature modules
 
 | Aspect | Public Demo | Production |
 |--------|-------------|------------|
-| Local LLM | Stub (returns mock JSON) | Real tokenizer + ONNX session + KV-cache |
+| Local LLM | Stub interface | Proprietary inference pipeline |
 | Prompts | Generic stub interface | Proprietary task-specific templates |
-| RAG | Stub interface | Local retrieval + optional web grounding |
+| Context Retrieval | Stub interface | Proprietary retrieval and grounding |
 | Router | Stub handlers | Full tool implementations |
-| Orchestrator | Simplified flow | Advanced retry, multi-step planning |
+| Orchestrator | Simplified flow | Advanced orchestration logic |

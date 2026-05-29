@@ -28,12 +28,12 @@ class ModelManager(private val context: Context) {
         }
 
         val expectedModels = listOf(
-            "gemma-local" to "llm",
-            "sherpa-asr" to "asr",
-            "sherpa-tts" to "tts",
+            "local-llm" to "llm",
+            "stt" to "asr",
+            "tts" to "tts",
             "vad" to "vad",
             "punctuation" to "punctuation",
-            "ocr-optional" to "ocr"
+            "ocr" to "ocr"
         )
 
         for ((folderName, type) in expectedModels) {
@@ -87,7 +87,7 @@ class ModelManager(private val context: Context) {
 
     fun ensureModelDirectories() {
         val base = File(appPrivateModelPath)
-        listOf("gemma-local", "sherpa-asr", "sherpa-tts", "vad", "punctuation", "ocr-optional").forEach {
+        listOf("local-llm", "stt", "tts", "vad", "punctuation", "ocr").forEach {
             File(base, it).mkdirs()
         }
     }

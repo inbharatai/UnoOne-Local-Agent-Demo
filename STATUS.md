@@ -5,31 +5,17 @@
 
 ---
 
-## Module Status
+## Status
 
-| Module | Status | Notes |
-|--------|--------|-------|
-| `app` | Included | Compose UI, ViewModels, FloatingService, Permissions |
-| `core` | Included | Result, ToolCall, TimelineStep, RiskLevel, Logger |
-| `storage` | Included | Room DB with 5 entities, 5 DAOs |
-| `modelmanager` | Included | Model detection shell |
-| `localbrain` | **Stub** | ONNX shell + rule-based fallback only |
-| `voice` | Included | Sherpa-ONNX wrappers, Android fallback |
-| `agentrouter` | **Stub** | Tool registry skeleton |
-| `safetyguard` | Included | 4-tier risk classifier |
-| `phonecontrol` | Included | PhoneControl, CalendarControl, PackageResolver |
-| `memory` | Included | Keyword context matching, preferences |
-| `skills` | Included | JSON step storage, trigger matching |
-| `observability` | Included | Latency metrics shell |
-| `accessibilitycontrol` | Included | Click, type, fill, scroll, swipe, read screen |
+All public shell modules are included. Proprietary inference, routing, and prompt layers are stubbed.
 
-## Known Limitations of Public Demo
+## Known Limitations
 
-- Local LLM inference is stubbed — real tokenizer and KV-cache are proprietary
-- RAG / context retrieval is stubbed — online retrieval logic is excluded
-- Prompt builder is a generic stub — production prompts are private
-- AgentRouter handlers are stubs — real tool implementations are private
-- Some advanced orchestration features (retry logic, multi-step planning) are simplified
+- Local LLM inference is stubbed — returns mock structured output.
+- Context retrieval is stubbed — no real local or online grounding.
+- Prompt builder is a generic interface — production templates are private.
+- Tool routing handlers are stubs — real implementations are private.
+- Advanced orchestration features are simplified.
 
 ---
 

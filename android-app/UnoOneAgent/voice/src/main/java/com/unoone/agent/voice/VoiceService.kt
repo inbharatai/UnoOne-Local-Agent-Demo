@@ -13,8 +13,8 @@ import com.unoone.agent.core.util.Logger
 import com.unoone.agent.voice.recorder.AudioRecorder
 import com.unoone.agent.voice.stt.AndroidSttEngine
 import com.unoone.agent.voice.stt.KeywordSpotterEngine
-import com.unoone.agent.voice.stt.SherpaSttEngine
-import com.unoone.agent.voice.tts.SherpaTtsEngine
+import com.unoone.agent.voice.stt.LocalSttEngine
+import com.unoone.agent.voice.tts.LocalTtsEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -31,8 +31,8 @@ class VoiceService : Service() {
 
     private val recorder = AudioRecorder()
     private var keywordSpotter: KeywordSpotterEngine? = null
-    private var sttEngine: SherpaSttEngine? = null
-    private var ttsEngine: SherpaTtsEngine? = null
+    private var sttEngine: LocalSttEngine? = null
+    private var ttsEngine: LocalTtsEngine? = null
     private var androidStt: AndroidSttEngine? = null
     private var useAndroidStt = true
 
@@ -71,25 +71,25 @@ class VoiceService : Service() {
     }
 
     private fun initEngines() {
-        // Try Sherpa-ONNX STT
+        // Try local STT engine
         val modelDir = getExternalFilesDir(null)?.absolutePath + "/models"
-        val stt = SherpaSttEngine("$modelDir/sherpa-asr")
+        val stt = LocalSttEngine("$modelDir/stt")
         if (stt.initialize() is Result.Success) {
             sttEngine = stt
             useAndroidStt = false
-            Logger.i("VoiceService: Sherpa STT ready")
+            Logger.i("VoiceService: Local STT ready")
         } else {
-            Logger.w("VoiceService: Sherpa STT unavailable, using Android fallback")
+            Logger.w("VoiceService: Local STT unavailable, using Android fallback")
             useAndroidStt = true
         }
 
-        // Try Sherpa-ONNX TTS
-        val tts = SherpaTtsEngine("$modelDir/sherpa-tts")
+        // Try local TTS engine
+        val tts = LocalTtsEngine("$modelDir/tts")
         if (tts.initialize() is Result.Success) {
             ttsEngine = tts
-            Logger.i("VoiceService: Sherpa TTS ready")
+            Logger.i("VoiceService: Local TTS ready")
         } else {
-            Logger.w("VoiceService: Sherpa TTS unavailable")
+            Logger.w("VoiceService: Local TTS unavailable")
         }
 
         // Try Keyword Spotter
@@ -266,7 +266,7 @@ class VoiceService : Service() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        // Restart service if killed by aggressive battery optimization (Xiaomi, Huawei, Oppo, etc.)
+        // Restart service if killed by aggressive battery optimization
         val restartIntent = Intent(this, VoiceService::class.java)
         startForegroundService(restartIntent)
         super.onTaskRemoved(rootIntent)

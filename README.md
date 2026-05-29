@@ -16,10 +16,10 @@ UnoOne is an **offline-first, privacy-centric Android AI assistant** that runs e
 
 Build a fully local AI companion that:
 - Works on mid-range Android phones with no internet
-- Understands natural language via on-device STT
-- Reasons locally using small Gemma-compatible models
-- Controls your phone safely through Accessibility Services
-- Speaks back using on-device TTS
+- Understands natural language via on-device speech recognition
+- Reasons locally using small, compatible local language models
+- Controls your phone safely through standard Android APIs
+- Speaks back using on-device speech synthesis
 - Learns your preferences over time via a local memory layer
 
 ---
@@ -32,55 +32,35 @@ Build a fully local AI companion that:
 | Language | Kotlin |
 | UI | Jetpack Compose + Material 3 |
 | Architecture | MVVM with modular Gradle modules |
-| Local LLM | Gemma-compatible ONNX models (via ONNX Runtime) |
-| STT | Sherpa-ONNX (offline) |
-| TTS | Sherpa-ONNX / Piper (offline) |
+| Local Inference | ONNX-compatible models (via ONNX Runtime) |
+| Speech Recognition | Offline local engine (via ONNX Runtime) |
+| Speech Synthesis | Offline local engine (via ONNX Runtime) |
 | Database | Room (SQLite) |
 | Accessibility | Android AccessibilityService |
 
 ---
 
-## Hardware Requirements
-
-- **OS**: Android 9 (API 28) or higher
-- **RAM**: 4 GB minimum, 6 GB+ recommended for LLM inference
-- **Storage**: ~500 MB for app + models
-- **Tested on**: Xiaomi 14 (Android 15), Samsung Galaxy S24, Pixel 8
-
-### Model Sizes
-
-| Feature | Model | Approx. Size |
-|---------|-------|-------------|
-| STT | Sherpa-ONNX ASR | ~70 MB |
-| TTS | Piper / Sherpa-ONNX TTS | ~30–60 MB |
-| Wake word | Keyword spotter | ~10–30 MB |
-| LLM | Gemma 2B IT (int4) | ~1–2 GB |
-
----
-
-## What's Included in This Public Repo
+## What's Included
 
 - **Android Shell**: Compose UI, ViewModels, Navigation, Screens
 - **Core Models**: Result types, Timeline steps, Tool calls, Risk levels
-- **Storage Layer**: Room database with Notes, Skills, Memory, Action Logs, Model Metadata
-- **Voice Layer**: STT/TTS interfaces, Audio Recorder, Sherpa-ONNX wrappers, Android fallback
-- **Device Action Layer**: Phone control (intents, calendar, camera), Accessibility control (click, scroll, swipe, type)
-- **Permission & Approval Layer**: Risk classifier with 4-tier safety model
+- **Storage Layer**: Room database for notes, skills, memory, action logs, and model metadata
+- **Voice Layer**: STT/TTS interfaces, Audio Recorder, offline engine wrappers, Android fallback
+- **Device Action Layer**: Phone control (intents, calendar, camera), Accessibility control
+- **Permission & Approval Layer**: Risk classifier with tiered safety model
 - **Skills/Actions Interface**: JSON-based skill storage and trigger matching
 - **Local Memory Layer**: Preference storage, corrections, pattern matching
-- **Model Manager**: File detection and checksum verification shell
+- **Model Manager**: File detection shell
 - **Observability**: Latency metrics and crash logging shell
 
 ## What's Intentionally Excluded
-
-The following are **not** in this public repo because they are proprietary:
 
 - Production prompt templates and system prompts
 - Advanced model routing and orchestration logic
 - Internal tool names and proprietary action handlers
 - Skill-generation and skill-learning logic
 - Internal security validation and audit rules
-- Production RAG / context retrieval implementations
+- Production context retrieval implementations
 - Private datasets, evaluation traces, and test logs
 - Any commit history from the private repository
 
@@ -128,54 +108,19 @@ scripts/                — ADB push and checksum helpers
 ### Run Without Models
 
 The app compiles and runs without any model files. In this mode:
-- Commands are parsed by the rule-based fallback
+- Commands are parsed by a rule-based fallback
 - STT falls back to Android SpeechRecognizer (requires internet)
 - No TTS output (silent mode)
 
 ### Push Models for Full Offline Mode
 
-```bash
-# STT
-adb push models/sherpa-asr/ /sdcard/Android/data/com.unoone.agent/files/models/sherpa-asr/
-
-# TTS
-adb push models/sherpa-tts/ /sdcard/Android/data/com.unoone.agent/files/models/sherpa-tts/
-
-# Wake word / VAD
-adb push models/vad/ /sdcard/Android/data/com.unoone.agent/files/models/vad/
-
-# Local LLM
-adb push models/gemma-local/ /sdcard/Android/data/com.unoone.agent/files/models/gemma-local/
-```
-
-See `scripts/adb-push-models/` for convenience scripts.
-
----
-
-## What Works in the Public Demo
-
-### Text Commands (Offline)
-- "Create a note: buy milk tomorrow"
-- "Open Chrome"
-- "Open WhatsApp"
-- "Check calendar"
-- "Read screen"
-- "Scroll down / scroll up"
-- "Go back / go home"
-- "Find and click Login"
-- "Fill username with john@example.com"
-
-### Voice Input (Requires Models)
-- Offline STT via Sherpa-ONNX
-- Offline TTS via Sherpa-ONNX Piper
-- Keyword spotting for wake word
-- Android SpeechRecognizer fallback (online)
+Place your local ONNX-compatible models in the `models/` directory and push to device storage via ADB. Model paths are configurable at runtime.
 
 ---
 
 ## License
 
-License to be confirmed. Do not assume MIT or Apache-2.0 until a `LICENSE` file is added.
+Apache-2.0
 
 ---
 

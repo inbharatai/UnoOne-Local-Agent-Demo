@@ -129,7 +129,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Manufacturer-specific autostart settings (Xiaomi, Huawei, Oppo, Vivo, OnePlus, Asus)
+        // Manufacturer-specific autostart settings
         val autostartIntent = PermissionManager.getAutostartIntent(this)
         if (autostartIntent != null) {
             try {

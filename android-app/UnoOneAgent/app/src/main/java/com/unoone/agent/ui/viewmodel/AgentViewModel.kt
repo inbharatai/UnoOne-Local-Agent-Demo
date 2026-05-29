@@ -65,7 +65,7 @@ class AgentViewModel(
         _isListening = false
         _amplitude.value = 0f
         viewModelScope.launch {
-            // Try Sherpa STT first, fall back to Android
+            // Try local STT engine first, fall back to Android
             if (voiceModule.isSttInitialized()) {
                 val result = voiceModule.stopAndTranscribe()
                 if (result is Result.Success && result.data.isNotBlank()) {

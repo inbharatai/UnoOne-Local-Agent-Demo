@@ -5,8 +5,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
 /**
- * Fallback rule-based parser for commands when the local LLM is not loaded.
- * Handles 30+ command patterns including gestures, navigation, skills, and compound commands.
+ * Fallback rule-based parser for commands when the local inference model is not loaded.
+ * Provides basic command pattern matching as a demo fallback.
  */
 object RuleBasedParser {
 

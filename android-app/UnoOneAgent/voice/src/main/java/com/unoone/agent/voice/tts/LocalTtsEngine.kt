@@ -4,11 +4,11 @@ import com.unoone.agent.core.model.Result
 import com.unoone.agent.core.util.Logger
 
 /**
- * Offline TTS using Sherpa-ONNX.
- * Uses reflection/safe-loading to ensure the app compiles and runs perfectly 
+ * Offline TTS engine wrapper.
+ * Uses reflection/safe-loading to ensure the app compiles and runs perfectly
  * on any Android device even if the native .so libraries are missing.
  */
-class SherpaTtsEngine(private val modelDir: String) {
+class LocalTtsEngine(private val modelDir: String) {
 
     private var tts: Any? = null
     private val ttsPlayer = TtsPlayer()
@@ -16,16 +16,16 @@ class SherpaTtsEngine(private val modelDir: String) {
 
     fun initialize(): Result<Unit> {
         return try {
-            Logger.i("SherpaTtsEngine: Checking model files in $modelDir")
+            Logger.i("LocalTtsEngine: Checking model files in $modelDir")
             val modelFile = java.io.File("$modelDir/model.onnx")
             val tokensFile = java.io.File("$modelDir/tokens.txt")
             val espeakDataDir = java.io.File("$modelDir/espeak-ng-data")
 
             if (!modelFile.exists() || !tokensFile.exists() || !espeakDataDir.exists()) {
-                return Result.Error("Sherpa TTS model files missing. Please download models to: $modelDir")
+                return Result.Error("Offline TTS model files missing. Please download models to: $modelDir")
             }
 
-            // Attempt to load Sherpa-ONNX classes dynamically
+            // Attempt to load native TTS classes dynamically
             val configClass = Class.forName("com.k2fsa.sherpa.onnx.OfflineTtsConfig")
             val modelConfigClass = Class.forName("com.k2fsa.sherpa.onnx.OfflineTtsModelConfig")
             val vitsConfigClass = Class.forName("com.k2fsa.sherpa.onnx.OfflineTtsVitsModelConfig")
@@ -45,20 +45,20 @@ class SherpaTtsEngine(private val modelDir: String) {
 
             tts = ttsClass.getConstructor(configClass).newInstance(config)
             initialized = true
-            Logger.i("SherpaTtsEngine: Offline TTS successfully initialized with high-quality models")
+            Logger.i("LocalTtsEngine: Offline TTS successfully initialized with high-quality models")
             Result.Success(Unit)
         } catch (e: ClassNotFoundException) {
-            Logger.w("SherpaTtsEngine: Sherpa-ONNX classes not found in classpath. Falling back to System TTS.")
-            Result.Error("Sherpa library not available")
+            Logger.w("LocalTtsEngine: Native TTS classes not found in classpath. Falling back to System TTS.")
+            Result.Error("Native TTS library not available")
         } catch (e: Exception) {
-            Logger.e("SherpaTtsEngine: Initialization failed", e)
-            Result.Error("Sherpa TTS failed: ${e.message}")
+            Logger.e("LocalTtsEngine: Initialization failed", e)
+            Result.Error("Offline TTS failed: ${e.message}")
         }
     }
 
     fun speak(text: String): Result<Unit> {
         if (!initialized || tts == null) {
-            return Result.Error("SherpaTtsEngine not initialized")
+            return Result.Error("LocalTtsEngine not initialized")
         }
 
         return try {
@@ -71,10 +71,10 @@ class SherpaTtsEngine(private val modelDir: String) {
             val sampleRate = audioClass.getMethod("getSampleRate").invoke(audioObj) as Float
 
             ttsPlayer.playPcm(samples, sampleRate.toInt())
-            Logger.i("SherpaTtsEngine: Speech generated successfully")
+            Logger.i("LocalTtsEngine: Speech generated successfully")
             Result.Success(Unit)
         } catch (e: Exception) {
-            Logger.e("SherpaTtsEngine: Speech generation failed", e)
+            Logger.e("LocalTtsEngine: Speech generation failed", e)
             Result.Error("TTS synthesis failed: ${e.message}")
         }
     }
@@ -93,7 +93,7 @@ class SherpaTtsEngine(private val modelDir: String) {
                 ttsClass.getMethod("close").invoke(tts)
             }
         } catch (e: Exception) {
-            Logger.e("SherpaTtsEngine: Error closing TTS", e)
+            Logger.e("LocalTtsEngine: Error closing TTS", e)
         }
         tts = null
         initialized = false
