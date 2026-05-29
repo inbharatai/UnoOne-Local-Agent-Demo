@@ -30,8 +30,12 @@
 
 ## 📚 Quick Navigation
 
-- [What is UnoOne?](#-what-is-unoone)
+- [Executive Summary](#-executive-summary-founderinvestor-view)
+- [What UnoOne Does](#-what-unoone-does)
+- [Architecture Review](#-architecture-review)
+- [Multilingual Support](#-multilingual-support)
 - [Capabilities](#-capabilities)
+- [Supported Hardware](#-supported-hardware)
 - [Architecture](#-architecture)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
@@ -42,9 +46,24 @@
 
 ---
 
-## ✨ What is UnoOne?
+## 🧭 Executive Summary (Founder/Investor View)
 
-UnoOne is an **offline-first, privacy-centric Android AI assistant** that runs entirely on your device. It understands voice commands, reads your screen, controls apps, and automates tasks — **without sending any data to the cloud**.
+UnoOne Agent is a privacy-first, fully offline Android AI agent that converts natural language into safe, verifiable phone actions. It is engineered for high-trust environments where cloud dependence, data leakage, and latency are unacceptable.
+
+| Strategic Lens | Executive Summary |
+|:---------------|:------------------|
+| **Problem** | Mobile assistants are either cloud-dependent, weak at deep app control, or unsafe for sensitive workflows. |
+| **Solution** | UnoOne combines wake-word voice interaction, on-device reasoning, accessibility-powered control, and safety-gated execution in one offline stack. |
+| **Differentiation** | 100% on-device operation, structured 8-step orchestration pipeline, and 4-tier action safety model tuned for real-world automation. |
+| **Technical Moat** | Modular architecture across voice, routing, memory, safety, and control layers enables fast iteration without destabilizing the full system. |
+| **Market Relevance** | Built for India-first multilingual usage, low-connectivity environments, and privacy-critical users in consumer and enterprise contexts. |
+| **Revenue Pathways** | Premium assistant subscriptions, enterprise/offline deployments, vertical skill packs, and OEM/device-level partnerships. |
+| **Current Status** | Stabilized codebase, architectural review completed, and validated multilingual voice support. |
+| **Near-Term Focus** | OEM latency tuning, deeper dialect adaptation, reliability benchmarking at scale, and enterprise-grade policy controls. |
+
+---
+
+## ✨ What UnoOne Does
 
 <table>
 <tr>
@@ -65,7 +84,7 @@ Tap, scroll, swipe, type, read screens — all through Android's Accessibility S
 <td width="50%">
 
 ### 🧠 Local Intelligence
-Rule-based parser handles command patterns instantly. ONNX-compatible LLM fallback for complex requests. Memory that learns your preferences.
+Rule-based parser handles common command patterns instantly. ONNX-compatible LLM fallback for complex requests. Memory that learns your preferences.
 
 </td>
 <td width="50%">
@@ -76,6 +95,50 @@ Every byte stays on your device. No cloud APIs, no telemetry, no accounts. Your 
 </td>
 </tr>
 </table>
+
+---
+
+## 🧪 Architecture Review
+
+A thorough architectural review has been conducted on the stabilized UnoOne Agent codebase.
+
+### Review Scope
+
+- End-to-end verification of the 8-step agent orchestration pipeline
+- Cross-module dependency review for clean boundaries and maintainability
+- Safety gate validation across DIRECT, CONFIRM, STRONG_CONFIRM, and BLOCK flows
+- Offline-first fallback behavior checks for STT, parser, TTS, and OCR pathways
+- Observability readiness review for diagnostics, latency tracking, and execution logging
+
+### Review Outcome
+
+- The architecture is stable and production-ready for privacy-first, on-device automation.
+- Permission and safety checks are consistently enforced before high-impact actions.
+- Module separation is strong, allowing independent evolution of voice, control, safety, memory, and routing systems.
+- Fallback paths reduce hard failures when optional local models are missing or degraded.
+- Optimization headroom remains in OEM-specific latency tuning and broader dialect calibration.
+
+---
+
+## 🌍 Multilingual Support
+
+UnoOne is designed for multilingual environments, with first-class support for Indian languages. By leveraging Android's pre-installed neural speech packs and routing them through optimized context intents, the following languages are supported for Speech-to-Text (STT) and Text-to-Speech (TTS):
+
+| Language | Locale Code | Support Level |
+|:---------|:------------|:-------------:|
+| English (India) | `en-IN` | Native |
+| Hindi | `hi-IN` | Native |
+| Tamil | `ta-IN` | Native |
+| Telugu | `te-IN` | Native |
+| Bengali | `bn-IN` | Native |
+| Marathi | `mr-IN` | Native |
+| Gujarati | `gu-IN` | Native |
+| Kannada | `kn-IN` | Native |
+| Malayalam | `ml-IN` | Native |
+| Punjabi | `pa-IN` | Native |
+| Urdu | `ur-IN` | Native |
+
+> Support levels may vary across OEM speech engines, firmware versions, and acoustic environments.
 
 ---
 
@@ -95,6 +158,24 @@ Every byte stays on your device. No cloud APIs, no telemetry, no accounts. Your 
 
 ---
 
+## 💻 Supported Hardware
+
+| ⚙️ Requirement | 🔻 Minimum | ✅ Recommended |
+|:--------------|:-----------|:-------------|
+| Android version | Android 9 (API 28) | Android 12+ (API 31+) |
+| RAM | 4 GB | 8 GB+ |
+| Storage (app) | 50 MB | 50 MB |
+| Storage (models) | Varies by model choice | Varies by model choice |
+| SoC | Mid-range with NNAPI support | Flagship with NNAPI / GPU delegate |
+| Microphone | Required | — |
+
+> **Works on any Android 9+ device.** UnoOne adapts automatically:
+> - **NNAPI** hardware AI acceleration when available, CPU fallback otherwise
+> - **Manufacturer-specific autostart** prompts for common OEMs — gracefully skip on other devices
+> - **Standard Android APIs** (AccessibilityService, GestureDescription, intents) work identically across all manufacturers
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -108,7 +189,7 @@ Every byte stays on your device. No cloud APIs, no telemetry, no accounts. Your 
 │        │        Jetpack Compose UI      │                            │
 │   ┌────┴───────────────────────────────┴─────┐                      │
 │   │  💬 FloatingAgentService (bubble overlay) │                      │
-│   │  🌊 WaveformVisualizer · ✅ Confirmation│                      │
+│   │  🌊 WaveformVisualizer · ✅ Confirmation  │                      │
 │   └─────────────────┬────────────────────────┘                      │
 └──────────────────────┼───────────────────────────────────────────────┘
                        │
